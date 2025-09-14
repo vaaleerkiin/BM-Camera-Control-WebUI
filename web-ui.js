@@ -119,14 +119,12 @@ function updateUIAll() {
       .flat()
       .map((c) => c);
 
-    // убираем дубликаты
     const uniqueCodecs = [...new Set(codecs)];
 
     codecSelect.innerHTML = uniqueCodecs
       .map((c) => `<option value="${c}">${c}</option>`)
       .join("");
 
-    // выбрать текущий codec
     const currentCodec = camera.propertyData["/system/format"]?.codec;
 
     codecSelect.value = currentCodec;
@@ -134,32 +132,27 @@ function updateUIAll() {
     updateResolutions();
   }
 
-  // Функция для обновления списка разрешений в зависимости от выбранного кодека
   function updateResolutions() {
-    const selectedCodec = codecSelect.value; // обратно к формату объекта
+    const selectedCodec = codecSelect.value;
     const formats =
       camera.propertyData["/system/supportedFormats"].supportedFormats;
 
-    // фильтруем форматы по выбранному кодеку
     const availableRes = formats
       .filter((f) => f.codecs.includes(selectedCodec))
       .map((f) => `${f.recordResolution.width}x${f.recordResolution.height}`);
 
-    // убираем дубликаты
     const uniqueRes = [...new Set(availableRes)];
 
     resSelect.innerHTML = uniqueRes
       .map((r) => `<option value="${r}">${r}</option>`)
       .join("");
 
-    // выбрать текущее разрешение
     const currentRes = camera.propertyData["/system/format"]?.recordResolution;
     resSelect.value = `${currentRes?.width}x${currentRes?.height}`;
 
     updateFPS();
   }
 
-  // Функция для обновления FPS в зависимости от выбранного кодека и разрешения
   function updateFPS() {
     const selectedCodec = codecSelect.value;
     const selectedRes = resSelect.value.split("x").map(Number);
@@ -178,54 +171,16 @@ function updateUIAll() {
       .map((fps) => `<option>${fps} fps</option>`)
       .join("");
 
-    // выбрать текущий fps
     const currentFPS = camera.propertyData["/system/format"]?.frameRate;
     if (fpsOptions.includes(currentFPS)) {
       fpsSelect.value = `${currentFPS} fps`;
     }
   }
 
-  // Обработчики изменения селектов
   codecSelect.addEventListener("change", updateResolutions);
   resSelect.addEventListener("change", updateFPS);
 
-  // Инициализация
   updateCodecs();
-
-  //   const codecSelect = document.getElementById("formatCodecSelect");
-  //   const resSelect = document.getElementById("formatResSelect");
-  //   const fpsSelect = document.getElementById("formatFPSSelect");
-
-  //   document.getElementById("formatCodecSelect").innerHTML = `
-  //   <option>${cameras[ci].propertyData["/system/format"]?.codec
-  //     .toUpperCase()
-  //     .replace(":", " ")
-  //     .replace("_", ":")}</option>
-  //    ${cameras[ci].propertyData[
-  //      "/system/supportedFormats"
-  //    ]?.supportedFormats[0].codecs.map(
-  //      (el) =>
-  //        `<option>${el
-  //          .toUpperCase()
-  //          .replace(":", " ")
-  //          .replace("_", ":")}</option>}</option>`
-  //    )}`;
-
-  //   let resObj = cameras[ci].propertyData["/system/format"]?.recordResolution;
-  //   document.getElementById("formatResSelect").innerHTML = `<option>${
-  //     resObj?.width + "x" + resObj?.height
-  //   }</option> ${cameras[ci].propertyData[
-  //     "/system/supportedFormats"
-  //   ]?.supportedFormats[0].codecs.map(
-  //     (el) =>
-  //       `<option>${el
-  //         .toUpperCase()
-  //         .replace(":", " ")
-  //         .replace("_", ":")}</option>}</option>`
-  //   )}`;
-  //   document.getElementById("formatFPSSelect").innerHTML = `<option>${
-  //     cameras[ci].propertyData["/system/format"]?.frameRate + " fps"
-  //   }</option>`;
 
   // ========== Recording State ==========
 
@@ -611,25 +566,21 @@ function codecChange(selectElement) {
   const supportedFormats =
     cameras[ci].propertyData["/system/supportedFormats"].supportedFormats;
 
-  // Фильтруем форматы, которые поддерживают выбранный кодек
   const formatsForCodec = supportedFormats.filter((f) =>
     f.codecs.includes(selectedCodec)
   );
 
-  // Получаем текущие значения
   let currentWidth =
     cameras[ci].propertyData["/system/format"].recordResolution.width;
   let currentHeight =
     cameras[ci].propertyData["/system/format"].recordResolution.height;
 
-  // Проверяем, поддерживается ли текущее разрешение новым кодеком
   let formatToUse = formatsForCodec.find(
     (f) =>
       f.recordResolution.width === currentWidth &&
       f.recordResolution.height === currentHeight
   );
 
-  // Если нет — берём максимальное разрешение
   if (!formatToUse) {
     formatToUse = formatsForCodec.reduce((prev, curr) =>
       curr.recordResolution.width * curr.recordResolution.height >
@@ -639,7 +590,6 @@ function codecChange(selectElement) {
     );
   }
 
-  // Применяем новый формат
   cameras[ci].PUTdata("/system/format", {
     codec: selectedCodec,
     frameRate: cameras[ci].propertyData["/system/format"].frameRate,
@@ -647,7 +597,6 @@ function codecChange(selectElement) {
     sensorResolution: formatToUse.sensorResolution,
   });
 
-  // Обновляем селект разрешений
   const resSelect = document.getElementById("formatResSelect");
   resSelect.value = `${formatToUse.recordResolution.width}x${formatToUse.recordResolution.height}`;
 }

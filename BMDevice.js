@@ -86,7 +86,6 @@ class BMDevice {
         this.propertyData[messageData.property] = messageData.value;
       }
 
-      // Обновляем UI не чаще, чем раз в UI_UPDATE_INTERVAL мс
       if (this.active) {
         let now = Date.now();
         if (now - lastUIUpdate >= UI_UPDATE_INTERVAL) {
