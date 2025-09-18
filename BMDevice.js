@@ -62,7 +62,7 @@ class BMDevice {
     // Get a self object for accessing within callback fns
     var self = this;
     let lastUIUpdate = 0;
-    const UI_UPDATE_INTERVAL = 300;
+    const UI_UPDATE_INTERVAL = 50;
     // Set the onmessage behavior
     this.ws.onmessage = (event) => {
       // Parse the event's data as JSON
